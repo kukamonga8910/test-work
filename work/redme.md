@@ -1,0 +1,14 @@
+для проверки после запуска контейнера 
+
+создание пользователя
+
+curl 'http://127.0.0.1:5555/create?username=<username>&password=<password>'
+
+Для удаления пользователя
+
+curl 'http://127.0.0.1:5555/del?username=<username>'
+
+
+для получения информации 
+
+curl 'http://127.0.0.1:5555/info'
