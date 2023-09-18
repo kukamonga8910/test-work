@@ -1,0 +1,16 @@
+2020-06-08 13:00:44,672 DEBUG LoggerDebugName 123456789 awe45erbgg457ywrths562w435g  keep in a context
+2020-06-08 13:00:44,690 ERROR ErrorLoggerNameLong null null I/O exception in a channel : [id: 0xdc55e4ee, L:/127.0.0.1:54568 - R:/127.0.0.1:65536]
+io.netty.channel.unix.Errors$NativeIoException: readAddress(..) failed: Connection timed out
+        at io.netty.channel.unix.Errors.newIOException(Errors.java:122) ~[netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.channel.unix.Errors.ioResult(Errors.java:146) ~[netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.channel.unix.FileDescriptor.readAddress(FileDescriptor.java:178) ~[netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.channel.epoll.AbstractEpollChannel.doReadBytes(AbstractEpollChannel.java:348) ~[netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.channel.epoll.AbstractEpollStreamChannel$EpollStreamUnsafe.epollInReady(AbstractEpollStreamChannel.java:794) [netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.channel.epoll.EpollEventLoop.processReady(EpollEventLoop.java:404) [netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.channel.epoll.EpollEventLoop.run(EpollEventLoop.java:304) [netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:886) [netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) [netty-all-4.1.23.Final.jar:4.1.23.Final]
+        at java.lang.Thread.run(Thread.java:748) [?:1.8.0_161]
+2020-06-08 13:00:44,690  INFO NameLoggerInfo null awe45qw4fgas5edr7gw345tyasdf Random info 123135 message
+123
+
