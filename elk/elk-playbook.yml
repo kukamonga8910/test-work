@@ -12,6 +12,9 @@
   - name: update file permissions 672 version
     raw: sudo chmod go-w ./configs/672/filebeat/config.yml; sudo chown root ./configs/672/filebeat/config.yml
 
+  - name: Create folder docker_volumes
+    raw: mkdir -p ./docker_volumes/{770,672}/elasticsearch/data
+
   - name: Install ELKF
     raw: docker compose up -d
 
