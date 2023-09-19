@@ -1,0 +1,25 @@
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /logs/test.log
+    fields:
+      service: test
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      templates:
+        - condition:
+            contains:
+              docker.container.name: beats-672
+          config:
+            - type: docker
+              containers.ids:
+                - "${data.docker.container.id}"
+              fields:
+                service: beats
+
+output.logstash:
+  hosts: ["logstash-672:5044"]
+

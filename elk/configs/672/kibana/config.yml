@@ -1,0 +1,9 @@
+server.name: kibana
+server.host: 0.0.0.0
+server.port: 5601
+#server.publicBaseUrl: http://127.0.0.1:5601
+#monitoring.ui.container.elasticsearch.enabled: true 
+
+elasticsearch.hosts: [ "http://elasticsearch-672:9200" ]
+elasticsearch.username: elastic
+elasticsearch.password: MyPw123

@@ -1,0 +1,31 @@
+{
+  "index_patterns": ["test-*"],
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "_doc": {
+     "properties": {
+       "Time": {
+         "type": "date"
+       },
+       "Priority": {
+         "type": "keyword"
+       },
+       "Logger": {
+         "type": "keyword"
+       },
+       "RandomNumber": {
+         "type": "integer"
+       },
+       "RandomSymbols": {
+         "type": "keyword"
+       },
+       "Message": {
+         "type": "text"
+       }
+     }
+    }
+  }
+}

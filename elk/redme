@@ -1,0 +1,4 @@
+curl -XPUT -H "Content-Type: application/json" -d @my_template.json http://localhost:9200/_template/my_template
+
+
+curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/elk/configs/770/elasticsearch/template/test.json http://localhost:9200/_template/test
