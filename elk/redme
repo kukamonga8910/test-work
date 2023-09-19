@@ -1,4 +1,9 @@
-curl -XPUT -H "Content-Type: application/json" -d @my_template.json http://localhost:9200/_template/my_template
 
+#Создание шаблона в elasticsearch 7.7.0
 
 curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/elk/configs/770/elasticsearch/template/test.json http://localhost:9200/_template/test
+
+
+#Создание шаблона в elasticsearch 6.7.2
+
+curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/elk/configs/672/elasticsearch/template/test.json http://localhost:9201/_template/test
