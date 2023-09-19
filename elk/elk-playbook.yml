@@ -15,8 +15,5 @@
     become_user: root
     raw: sudo chmod go-w ./configs/672/filebeat/config.yml; sudo chown root ./configs/672/filebeat/config.yml
 
-  - name: Create Folders docker_volumes
-    raw: mkdir -p ./docker_volumes/{770,670}/elasticsearch/data
-
   - name: Install ELKF
     raw: docker compose up -d
