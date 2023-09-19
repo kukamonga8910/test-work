@@ -7,3 +7,6 @@ curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/
 #Создание шаблона в elasticsearch 6.7.2
 
 curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/elk/configs/672/elasticsearch/template/test.json http://localhost:9201/_template/test
+
+По поводу Filebeat Читал в документации что он имеет только один выход поэтому я так думаю что бы заработали 2 output нужно поднять еще один кантейнер с filebeat для
+записи лога в файл но я поднимать не стал так как виртуалка начала сильно тормозить я просто написал конфиг на output в файл
