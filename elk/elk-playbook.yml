@@ -8,14 +8,12 @@
   - name: update file permissions 770 version
     become: yes
     become_user: root
-    ansible.builtin.command:
-    cmd: "sudo chmod go-w ./configs/770/filebeat/config.yml; sudo chown root ./configs/770/filebeat/config.yml"
+    shell: sudo chmod 700 ./configs/770/filebeat/config.yml; sudo chown root ./configs/770/filebeat/config.yml
 
   - name: update file permissions 672 version
     become: yes
     become_user: root
-    ansible.builtin.command:
-    cmd: "sudo chmod go-w ./configs/672/filebeat/config.yml; sudo chown root ./configs/672/filebeat/config.yml"
+    shell: sudo chmod 700 ./configs/672/filebeat/config.yml; sudo chown root ./configs/672/filebeat/config.yml
 
   - name: Install ELKF
     raw: docker compose up -d
