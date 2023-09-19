@@ -2,18 +2,21 @@
 
 - name: Install ELK 7.7.0 and 6.7.2 Version
   hosts: localhost
-  become: true
 
   tasks:
 
   - name: update file permissions 770 version
+    become: yes
+    become_user: root
     raw: sudo chmod go-w ./configs/770/filebeat/config.yml; sudo chown root ./configs/770/filebeat/config.yml
 
   - name: update file permissions 672 version
+    become: yes
+    become_user: root
     raw: sudo chmod go-w ./configs/672/filebeat/config.yml; sudo chown root ./configs/672/filebeat/config.yml
+
+  - name: Create Folders docker_volumes
+    raw: mkdir -p ./docker_volumes/{770,670}/elasticsearch/data
 
   - name: Install ELKF
     raw: docker compose up -d
-
-  - name: update Permission Folder
-    raw: sudo chown -R are:are ./docker_volumes/
