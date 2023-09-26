@@ -22,3 +22,7 @@
     become: yes
     become_user: root
     shell: sudo chown -R are:are ./docker_volumes/
+
+  - name: Upload Template ElasticSearch
+    shell: curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/elk/configs/770/elasticsearch/template/test.json http://localhost:9200/_template/test
+    shell: curl -XPUT -H "Content-Type: application/json" -u elastic:MyPw123 -d @/home/are/elk/configs/672/elasticsearch/template/test.json http://localhost:9201/_template/test
