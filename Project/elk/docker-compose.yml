@@ -1,0 +1,136 @@
+version: '3.7'
+
+services:
+  elasticsearch-770:
+    image: elasticsearch:7.7.0
+    container_name: elasticsearch-770
+    volumes:
+      - ./configs/770/elasticsearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./docker_volumes/770/elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: "elastic"
+      ELASTIC_PASSWORD: "MyPw123"
+      discovery.type: single-node
+    networks:
+      - elk-770
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  logstash-770:
+    image: logstash:7.7.0
+    container_name: logstash-770
+    volumes:
+      - ./configs/770/logstash/config.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./configs/770/logstash/pipelines/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logs/:/logs/
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+    ports:
+      - "5044:5044"
+      - "5001:5000"
+      - "9600:9600"
+    networks:
+      - elk-770
+    depends_on:
+      - elasticsearch-770
+
+  kibana-770:
+    image: kibana:7.7.0
+    container_name: kibana-770
+    depends_on:
+      - elasticsearch-770
+    volumes:
+      - ./configs/770/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    networks:
+      - elk-770
+    ports:
+      - "5601:5601"
+
+  beats-770:
+    image: elastic/filebeat:7.7.0
+    container_name: beats-770
+    volumes:
+      - ./configs/770/filebeat/config.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs/:/logs/
+    user: "root"
+    networks:
+      - elk-770
+    depends_on:
+      - elasticsearch-770
+
+# ELK 6.7.2
+      
+  elasticsearch-672:
+    image: elasticsearch:6.7.2
+    container_name: elasticsearch-672
+    volumes:
+      - ./configs/672/elasticsearch/config.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - ./docker_volumes/672/elasticsearch/data:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: "-Xmx512m -Xms512m"
+      ELASTIC_USERNAME: "elastic"
+      ELASTIC_PASSWORD: "MyPw123"
+      discovery.type: single-node
+    networks:
+      - elk-672
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+
+  logstash-672:
+    image: logstash:6.7.2
+    container_name: logstash-672
+    volumes:
+      - ./configs/672/logstash/config.yml:/usr/share/logstash/config/logstash.yml:ro
+#      - ./configs/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./configs/672/logstash/pipelines/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logs/:/logs/
+    environment:
+      LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+    ports:
+      - "5045:5044"
+      - "5002:5000"
+      - "9601:9600"
+    networks:
+      - elk-672
+    depends_on:
+      - elasticsearch-672
+
+  kibana-672:
+    image: kibana:6.7.2
+    container_name: kibana-672
+    depends_on:
+      - elasticsearch-672
+    volumes:
+      - ./configs/672/kibana/config.yml:/usr/share/kibana/config/kibana.yml:ro
+    networks:
+      - elk-672
+    ports:
+      - "5602:5601"
+
+  beats-672:
+    image: elastic/filebeat:6.7.2
+    container_name: beats-672
+    volumes:
+      - ./configs/672/filebeat/config.yml:/usr/share/filebeat/filebeat.yml
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs/:/logs/
+    user: "root"
+    networks:
+      - elk-672
+    depends_on:
+      - elasticsearch-672    
+      
+
+networks:
+  elk-770:
+    name: elk-770
+    driver: bridge
+  elk-672:
+    name: elk-672
+    driver: bridge

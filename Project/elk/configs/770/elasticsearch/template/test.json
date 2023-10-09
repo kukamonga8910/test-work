@@ -1,0 +1,31 @@
+{
+  "index_patterns": ["test-*"],
+  "version": 70000,
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "properties": {
+      "Time": {
+        "type": "date",
+        "format": "strict_date_optional_time||epoch_millis"
+      },
+      "Priority": {
+        "type": "keyword"
+      },
+      "Logger": {
+        "type": "keyword"
+      },
+      "RandomNumber": {
+        "type": "integer"
+      },
+      "RandomSymbols": {
+        "type": "keyword"
+      },
+      "Message": {
+        "type": "text"
+      }
+    }
+  }
+}
