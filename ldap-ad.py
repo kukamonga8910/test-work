@@ -128,5 +128,5 @@ def create_account_ad(account):
             add_group(server, new_user)
 
 
-servers = [('192.168.100.129', 'ldap', 'QAZqaz123'), ('192.168.100.128', 'ldap', 'QAZqaz123')]
+servers = [('192.168.100.129', 'username_admin', 'password_admin'), ('192.168.100.128', 'username_admin', 'password_admin')]
 username = generate_account(input('Введите ФИО пользователя: '))
