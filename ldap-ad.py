@@ -1,11 +1,12 @@
 from googletrans import Translator
-import string, secrets
+import string, secrets, csv
 from pyad import *
 from ldap3 import Server, Connection, ALL_ATTRIBUTES, ALL, SUBTREE
+from datetime import timedelta
 
 def generate_account(username):
     account = []
-    for i, names in enumerate(username.split(","), start=1):
+    for names in username.split(","):
         fullName = names.strip()
         firstnameRus, nameRus, lastnameRus = fullName.split()
         translator = Translator()
@@ -13,28 +14,6 @@ def generate_account(username):
         firstnameEng, nameEng, lastnameEng = EngFullName.text.split()
         login_ad_kos = f"{firstnameEng}" + f"{nameEng[0]}" + f"{lastnameEng[0]}"
         login_ad_msk = f"{nameEng[0]}." + f"{firstnameEng}"
-        
-        for srv in servers:
-            server = Server(f'ldap://{srv[0]}', get_info=ALL)
-            conn = Connection(server, user=f'{srv[1]}', password=f'{srv[2]}')
-            if not conn.bind():
-                print('Не удалось установить подключение:', conn.result)
-            if srv[0] == '192.168.100.129':
-#                exit()
-                conn.search('dc=test,dc=lan', '(objectClass=person)', attributes=ALL_ATTRIBUTES)
-                for entry in conn.entries:
-                    username = entry['sAMAccountName'].value
-                    if username == login_ad_kos.lower():
-                        login_ad_kos = f"{firstnameEng}" + f"{nameEng[0:2]}" + f"{lastnameEng[0]}"
-                        break
-            else:
-                conn.search('dc=test,dc=local', '(objectClass=person)', attributes=ALL_ATTRIBUTES)
-                for entry in conn.entries:
-                    username = entry['sAMAccountName'].value
-                    if username == login_ad_msk.lower():
-                        login_ad_msk = f"{nameEng[0:2]}." + f"{firstnameEng}"
-                        break
-        conn.unbind()
         password_account = generate_password()
         tel = input("Введите номер телефона: ")
         accounts = (login_ad_kos.lower(), login_ad_msk.lower(), password_account, fullName, firstnameRus, nameRus, lastnameRus, tel, firstnameEng, nameEng, lastnameEng)
@@ -84,19 +63,85 @@ def add_group(servers, username):
         group = pyad.adgroup.ADGroup.from_dn(all_group[int(index) - 1])  # Поиск группы по имени
         group.add_members(username) 
 
-
 def get_user_path(servers, username):
     server = Server(f'ldap://{servers[0]}', get_info=ALL)
     conn = Connection(server, user=f'{servers[1]}', password=f'{servers[2]}')
     conn.bind()
     if servers[0] == '192.168.100.129':
-        search_base = 'dc=test,dc=lan'
-        conn.search(search_base, f'(sAMAccountName={username[0]})')
+        conn.search('dc=test,dc=lan', f'(sAMAccountName={username[0]})')
     else:
-        search_base = 'dc=test,dc=local'
-        conn.search(search_base, f'(sAMAccountName={username[1]})')
+        conn.search('dc=test,dc=local', f'(sAMAccountName={username[1]})')
     for entry in conn.entries:
         return entry.entry_dn
+
+def check_account(srv, username):
+    server = Server(f'ldap://{srv[0]}', get_info=ALL)
+    conn = Connection(server, user=f'{srv[1]}', password=f'{srv[2]}')
+    conn.bind()
+    if srv[0] == '192.168.100.129':
+        conn.search('dc=test,dc=lan', '(objectClass=person)', attributes=ALL_ATTRIBUTES)
+        for entry in conn.entries:
+            login = entry['sAMAccountName'].value
+            if username[0] == login:
+                username[0] = f"{username[8].lower()}" + f"{username[9][0:2].lower()}" + f"{username[10][0].lower()}"
+                break
+    else:
+        conn.search('dc=test,dc=local', '(objectClass=person)', attributes=ALL_ATTRIBUTES)
+        for entry in conn.entries:
+            login = entry['sAMAccountName'].value
+            if username[1] == login:
+                username[1] = f"{username[9][0:2].lower()}." + f"{username[8].lower()}"
+                break 
+    conn.unbind()
+    return username
+
+def get_name_mail():
+    server = Server(f'ldap://{servers[0][0]}')
+    conn = Connection(server, user=f'{servers[0][1]}', password=f'{servers[0][2]}')
+    conn.bind()
+    conn.search('dc=test,dc=lan','(&(objectCategory=Person)(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))', SUBTREE, attributes = ['cn','mail'])
+    with open('mail.csv', 'w', newline='', encoding="cp1251") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(['Имя', 'Почта'])
+
+        for entry in conn.entries:
+            cn = entry.cn
+            mail = entry.mail
+            if cn != None and mail != None:
+                csvwriter.writerow([cn, mail])
+    conn.unbind()
+
+def get_info_user():
+    while True:
+        tz = timedelta(hours=3)
+        server = Server(f'{servers[0][0]}', get_info=ALL)
+        conn = Connection(server, f'{servers[0][1]}', f'{servers[0][2]}', auto_bind=True)
+        conn.search('dc=test,dc=lan','(&(objectCategory=Person)(!(UserAccountControl:1.2.840.113556.1.4.803:=2))(givenName=*)(sn=*))', SUBTREE, attributes =['cn','proxyAddresses','department','sAMAccountName', 'displayName', 'telephoneNumber', 'ipPhone', 'streetAddress','title','manager','objectGUID','company','lastLogon','mail','objectSid','memberOf','givenName'])
+        name = list(conn.entries)
+        userName = input('Введите ФИО, Фамилию или номер телефона пользователя \nдля вывода полного списка пользователеф введите all: ')
+        if userName == 'all':
+            for i in name:
+                print(f'-----------------------------------------------------\nФИО: {i.cn}\nТелефон: {i.telephoneNumber}\nПочта: {i.mail}\nSSID: {i.objectSid}\nГруппы: {i.memberOf}\nЛогин: {i.sAMAccountName}\nАвторизация: {i.lastLogon.value+tz}\n------------------------------------------------------\n')
+            conn.unbind()
+            key = input('Для продолжения поиска пользователей нажмите "Y" для выхода из программы нажмите ENTER : ')
+            if key == "y":
+                continue
+            else:
+                break
+        elif userName != 'all':
+            userName = userName.split(',')
+            for i in userName:
+                for n in name:
+                    if i.lstrip(' ').capitalize() == n.cn or i.lstrip(' ').capitalize() == n.givenName or i == n.telephoneNumber:
+                        print(f'-----------------------------------------------------\nФИО: {n.cn}\nТелефон: {n.telephoneNumber}\nПочта: {n.mail}\nSSID: {n.objectSid}\nГруппы: {n.memberOf}\nЛогин: {n.sAMAccountName}\nАвторизация: {n.lastLogon.value+tz}\n------------------------------------------------------\n')
+                        break
+                continue
+        conn.unbind()
+        key = input('Для продолжения поиска пользователей нажмите "Y" для выхода из программы нажмите ENTER : ')
+        if key == "y":
+            continue
+        else:
+            break
 
 def create_account_ad(account):
     choice = int(input('На каком сервере создать аккаунт?\n1. AD-KOS\n2. AD-MSK\n3. На всех\n'))
@@ -108,8 +153,13 @@ def create_account_ad(account):
             srv.append(servers[1])
         case 3:
             srv = servers
+    info_account_kos = []
+    info_account_msk = []
+    info_server = []
     for server in srv:
+        info_server.append(server)
         for user_account in account:
+            check_account(server, user_account)
             ou = get_ou(server)
             pyad.set_defaults(ldap_server=server[0], username=server[1], password=server[2])
             new_user = pyad.aduser.ADUser.create(user_account[3], pyad.adcontainer.ADContainer.from_dn(ou))
@@ -118,15 +168,35 @@ def create_account_ad(account):
             new_user.update_attribute('displayName', user_account[3])
             new_user.update_attribute('mail', f'{user_account[0]}@top-energo.com')
             new_user.update_attribute('telephoneNumber', user_account[7])
+            new_user.update_attribute('givenName', user_account[4])
             if server[0] == '192.168.100.129':
                 new_user.update_attribute('sAMAccountName', user_account[0])
                 new_user.update_attribute('userPrincipalName', user_account[0])
+                info_account_kos.append(user_account)
             else:
                 new_user.update_attribute('sAMAccountName', user_account[1])
                 new_user.update_attribute('userPrincipalName', user_account[1])
-            new_user.update_attribute("userAccountControl", 66112)
+                info_account_msk.append(user_account)
+            new_user.update_attribute("userAccountControl", 66080)
             add_group(server, new_user)
+    for srv in info_server:
+        for login_kos, Login_msk in zip(info_account_kos, info_account_msk):
+            if srv[0] == '192.168.100.129':
+                print(f"{srv[3]}. top-energo\{login_kos[0]}: {login_kos[2]}")
+            else: 
+                print(f"{srv[3]}. top-energo\{Login_msk[1]}: {Login_msk[2]}")
 
 
-servers = [('ip-server-ad', 'username_admin', 'password_admin'), ('ip-server-ad', 'username_admin', 'password_admin')]
-username = generate_account(input('Введите ФИО пользователя: '))
+
+choice = int(input('1) Создание Пользователя\n2) Выгрузка почт в csv\n3) Получение информации пользователей\n'))
+servers = [('192.168.100.129', 'ldap', 'QAZqaz123', 'AD-KOS'), ('192.168.100.128', 'ldap', 'QAZqaz123', 'AD-MSK')]
+match choice:
+    case 1:
+        username = generate_account(input('Введите ФИО пользователя: '))
+    case 2:
+        get_name_mail()
+    case 3:
+        get_info_user()
+
+
+
