@@ -180,11 +180,12 @@ def create_account_ad(account):
             new_user.update_attribute("userAccountControl", 66080)
             add_group(server, new_user)
     for srv in info_server:
-        for login_kos, Login_msk in zip(info_account_kos, info_account_msk):
-            if srv[0] == '192.168.100.129':
+        if srv[0] == '192.168.100.129':   
+            for login_kos in info_account_kos:
                 print(f"{srv[3]}. top-energo\{login_kos[0]}: {login_kos[2]}")
-            else: 
-                print(f"{srv[3]}. top-energo\{Login_msk[1]}: {Login_msk[2]}")
+        if srv[0] == '192.168.100.128':
+            for login_msk in info_account_msk:    
+                print(f"{srv[3]}. top-energo\{login_msk[1]}: {login_msk[2]}")
 
 
 
