@@ -188,7 +188,7 @@ def create_account_ad(account):
 
 
 choice = int(input('1) Создание Пользователя\n2) Выгрузка почт в csv\n3) Получение информации пользователей\n'))
-servers = [('192.168.100.129', 'ldap', 'QAZqaz123', 'AD-KOS', 'test-lan', 'dc=test,dc=lan'), ('192.168.100.128', 'ldap', 'QAZqaz123', 'AD-MSK', 'test-local', 'dc=test,dc=local')]
+servers = [('<ip-server-ad>', '<username-admin>', '<password>', 'AD-KOS', 'test-lan', 'dc=test,dc=lan'), ('<ip-server-ad>', '<username-admin>', '<password>', 'AD-MSK', 'test-local', 'dc=test,dc=local')]
 match choice:
     case 1:
         username = generate_account(input('Введите ФИО пользователя: '))
