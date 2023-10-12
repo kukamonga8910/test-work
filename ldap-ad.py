@@ -4,6 +4,7 @@ from pyad import *
 from ldap3 import Server, Connection, ALL_ATTRIBUTES, ALL, SUBTREE
 from datetime import timedelta
 
+# Создание Аккаунтов 
 def generate_account(username):
     account = []
     for names in username.split(","):
@@ -19,14 +20,16 @@ def generate_account(username):
         accounts = (login_ad_kos.lower(), login_ad_msk.lower(), password_account, fullName, firstnameRus, nameRus, lastnameRus, tel, firstnameEng, nameEng, lastnameEng)
         account.append(list(accounts))
     return create_account_ad(account)
-        
+
+# Создание паролей 
 def generate_password():
     while True:
         alphabet = string.ascii_lowercase + string.ascii_uppercase + string.digits
         password = ''.join(secrets.choice(alphabet) for i in range(8))
         if any(c.islower() for c in password) and any(c.isupper() for c in password) and any(c.isdigit() for c in password):
             return password
-        
+
+# Получение всех подразделений на домене
 def get_ou(servers):
     server = Server(f'ldap://{servers[0]}', get_info=ALL)
     conn = Connection(server, user=f'{servers[1]}', password=f'{servers[2]}')
@@ -43,6 +46,7 @@ def get_ou(servers):
     choice = int(input('В какое подразделение добавить пользователя введите номер подразделения: '))
     return all_ou[choice - 1]
 
+# Получение всех Групп в домене
 def add_group(servers, username):
     server = Server(f'ldap://{servers[0]}', get_info=ALL)
     conn = Connection(server, user=f'{servers[1]}', password=f'{servers[2]}')
@@ -60,6 +64,7 @@ def add_group(servers, username):
         group = pyad.adgroup.ADGroup.from_dn(all_group[int(index) - 1])  # Поиск группы по имени
         group.add_members(username) 
 
+# Получение полного пути пользователя в домене например "CN=zabbix,OU=ldap,OU=Пользователи,OU=USERS,DC=test,DC=local"
 def get_user_path(servers, username):
     server = Server(f'ldap://{servers[0]}', get_info=ALL)
     conn = Connection(server, user=f'{servers[1]}', password=f'{servers[2]}')
@@ -71,6 +76,7 @@ def get_user_path(servers, username):
     for entry in conn.entries:
         return entry.entry_dn
 
+# Проверка логина пользователя в домене если есть совпадение логина то к логину нового пользователя добавляется одна буква например Иванов Иван Иванович -> ivanovii -> ivanovivi 
 def check_account(servers, username):
     server = Server(f'ldap://{servers[0]}', get_info=ALL)
     conn = Connection(server, user=f'{servers[1]}', password=f'{servers[2]}')
@@ -92,6 +98,7 @@ def check_account(servers, username):
     conn.unbind()
     return username
 
+# Получение почт всех активированных пользователей если пользователь отключен то он игнорируется после получения почт происходит запись в csv файл
 def get_name_mail():
     server = Server(f'ldap://{servers[0][0]}')
     conn = Connection(server, user=f'{servers[0][1]}', password=f'{servers[0][2]}')
@@ -108,6 +115,7 @@ def get_name_mail():
                 csvwriter.writerow([displayName, mail])
     conn.unbind()
 
+# Получение информации о пользователях в домене можно выполнить поиск по ФИО, номеру иелефона, либо получить информацию по всем пользователям введя all
 def get_info_user():
     while True:
         tz = timedelta(hours=3)
@@ -140,6 +148,7 @@ def get_info_user():
         else:
             break
 
+# создание пользователя в домене и обновление его атррибутов
 def create_account_ad(account):
     choice = int(input('На каком сервере создать аккаунт?\n1. AD-KOS\n2. AD-MSK\n3. На всех\n'))
     srv = []
