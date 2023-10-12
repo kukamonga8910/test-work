@@ -200,6 +200,7 @@ choice = int(input('1) Создание Пользователя\n2) Выгру�
 servers = [('<ip-server-ad>', '<username-admin>', '<password>', 'AD-KOS', 'test-lan', 'dc=test,dc=lan'), ('<ip-server-ad>', '<username-admin>', '<password>', 'AD-MSK', 'test-local', 'dc=test,dc=local')]
 match choice:
     case 1:
+        # Пользователей можно сразу заводить несколько через запитую например Иванов Иван Иванович, Петров Петр Петрович
         username = generate_account(input('Введите ФИО пользователя: '))
     case 2:
         get_name_mail()
