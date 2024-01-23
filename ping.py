@@ -5,7 +5,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 sleep_interval = 120  # (In seconds) Check Interval
-source = {'192.168.10.23': 'ECOSYS P3145dn'}  #192.168.10.222
+source = {'IP-Host': 'Name-Host'}
 OneMail = False
 
 def stat_ip_logs(ping,ip_source,name_source): #resource availability check function #Logging function if ping is high
