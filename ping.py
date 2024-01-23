@@ -29,11 +29,11 @@ def stat_ip_logs(ping,ip_source,name_source): #resource availability check funct
 
 def mail(message):
     global OneMail
-    sender = "cheker@top-energo.com"
+    sender = "кто посылает письмо mail"
     # your password = "your password"
-    password = "y7Nq5yft4bgvvzLshved"
-    to_sender = "vladimirovav@top-energo.com"
-    server = smtplib.SMTP_SSL("smtp.mail.ru", 465)
+    password = "password"
+    to_sender = "mail"
+    server = smtplib.SMTP_SSL("smtp-server", port)
 #    server.starttls()
 
     try:
