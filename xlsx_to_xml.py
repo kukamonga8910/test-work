@@ -6,24 +6,10 @@ import keyboard
 
 
 # Путь к файлу xlsx
-FilePaths = '\\\luna\\public\\OFFICE\\CS-DEP\\private_folders\\AGremilova\\ЭДО\\'
+FilePaths = 'E:\\1\\'
 FileXmlName = ''
 # Товары
 product = []
-# Модель
-model = []
-# количество
-number = []
-# Еденица измерения пример штук=шт
-unit = []
-# Цена
-price = []
-# Сумма
-amount = []
-# Расчитаная сумма товара с НДС 20%
-amountNds = []
-# Сумма налога
-taxAmount = []
 # Итоговая сумма документа
 totalAmount = 0
 # Итоговая сумма с расчетом НДС 20%
@@ -39,16 +25,22 @@ def getFiles(filePaths):
     filesXlsx = None
     fileXml = None
     files = os.listdir(filePaths)
-    files = [file for file in files if os.path.isfile(os.path.join(filePaths, file)) and 'NEW_' not in file]
-    files_with_dates = [(file, os.path.getmtime(os.path.join(filePaths, file))) for file in files]
-    files_with_dates.sort(key=lambda x: x[1], reverse=True)
-    last_two_files = files_with_dates[:2]
 
-    for file, timestamp in last_two_files:
+# Получение всех файлов в указанной директории, исключая файлы, содержащие 'NEW_' в названии
+    files = [file for file in os.listdir(filePaths) if os.path.isfile(os.path.join(filePaths, file)) and 'NEW_' not in file]
+
+# Сортировка файлов по дате изменения
+    files.sort(key=lambda file: os.path.getmtime(os.path.join(filePaths, file)), reverse=True)
+
+# Получение двух самых новых файлов
+    last_two_files = files[:2]
+
+    for file in last_two_files:
         if file.endswith('.xlsx'):
             if file.startswith('~$'):
-                print('Закройте пожалуйста файл xlsx...')
-                exit()
+                print(f'Закройте пожалуйста файл {file}... и нажмите ENTER для продолжения')
+                keyboard.read_event()
+                return getFiles(FilePaths)
             filesXlsx = os.path.join(filePaths, file)
         elif file.endswith('.xml'):
             FileXmlName = file
@@ -59,49 +51,33 @@ def getFiles(filePaths):
 
 # В данной функции получаем данные из файла и заполняем массивы
 def retrievingDataFromXlsx(filesXlsx):
-    wookbook = openpyxl.load_workbook(filesXlsx)
+    global totalAmount
+    wookbook = openpyxl.load_workbook(filesXlsx, data_only=True)
     worksheet = wookbook.active
     for i in range(1, worksheet.max_row):
         if worksheet['B' + str(i)].value == 'Наименование оборудования и Работ':
             for j in range(i+1, worksheet.max_row):
                 if worksheet['B' + str(j)].value == None:
+                    totalAmount = worksheet['K' + str(j)].value
                     break
-                product.append(worksheet['B' + str(j)].value)
-                model.append(worksheet['F' + str(j)].value)
-                number.append(worksheet['H' + str(j)].value)
-                unit.append(worksheet['I' + str(j)].value)
-                price.append(worksheet['J' + str(j)].value)
-# Вызывыаем функцию для подсчета суммы товаров и итоговой суммы документа
-    getTotal(number, price)
+                product.append({'product': worksheet['B' + str(j)].value,
+                                'model': worksheet['F' + str(j)].value,
+                                'number': worksheet['H' + str(j)].value,
+                                'unit': worksheet['I' + str(j)].value,
+                                'price': worksheet['J' + str(j)].value,
+                                'sum': worksheet['K' + str(j)].value,
+                                'sumNds': worksheet['K' + str(j)].value * 1.2,
+                                'taxSumNds': worksheet['K' + str(j)].value * 1.2 - worksheet['K' + str(j)].value})
 
-# Вданной функции получаю сумму товара и общую сумму документа 
-def getTotal(number, price):
-    global totalAmount
+
+# Собираем новый XML файл из полученных данных
+def createXml(fileXml):
+    global count
     global totalAmountNds
     global totalAmountTax
 
-    for numbers, prices in zip(number, price):
-        result = numbers * prices
-        amount.append(result)
-
-    totalAmount = sum(amount)
     totalAmountNds = totalAmount * 1.2
     totalAmountTax = totalAmountNds - totalAmount
-    # totalAmount = totalAmount
-    
-    NdsTotal(amount)
-        
-
-# В данной функции происходит расчет ндс 20% и округление до копеек
-def NdsTotal(amount):
-    for amounts in amount:
-        nds = amounts * 1.2
-        taxAmounts = nds - amounts
-        amountNds.append(nds)
-        taxAmount.append(taxAmounts)
-
-def createXml(fileXml):
-    global count
 
     tree = ET.parse(fileXml)
     root = tree.getroot()
@@ -118,16 +94,16 @@ def createXml(fileXml):
     newTable = ET.Element('ТаблСчФакт')
     index = list(document_node).index(svschet_fact_node) + 1
 
-    for products, models, numbers, units, prices, amounts, amountsNds, taxAmounts in zip(product, model, number, unit, price, amount, amountNds, taxAmount):
+    for products in product:
         new_svedtov = ET.SubElement(newTable, 'СведТов', {
             'НомСтр': f"{count}",
-            'НаимТов': f"{products}" + ' ' + f"{models}" if models != None else f'{products}',
+            'НаимТов': f"{products['product']}" + ' ' + f"{products['model']}" if products['model'] != None else f"{products['product']}",
             'ОКЕИ_Тов': "796",
-            'КолТов': f"{numbers}",
-            'ЦенаТов': f"{prices:.2f}",
-            'СтТовБезНДС': f"{amounts:.2f}",
+            'КолТов': f"{products['number']}",
+            'ЦенаТов': f"{products['price']:.2f}",
+            'СтТовБезНДС': f"{products['sum']:.2f}",
             'НалСт': "20%",
-            'СтТовУчНал': f"{amountsNds:.2f}"
+            'СтТовУчНал': f"{products['sumNds']:.2f}"
         })
         akziz = ET.SubElement(new_svedtov, 'Акциз')
         bezakziz = ET.SubElement(akziz, 'БезАкциз')
@@ -135,10 +111,10 @@ def createXml(fileXml):
 
         sumnal = ET.SubElement(new_svedtov, 'СумНал')
         sumnal_value = ET.SubElement(sumnal, 'СумНал')
-        sumnal_value.text = f'{taxAmounts:.2f}'
+        sumnal_value.text = f"{products['taxSumNds']:.2f}"
 
         dopsvedtov = ET.SubElement(new_svedtov, 'ДопСведТов', {
-            'НаимЕдИзм': f"{units}"
+            'НаимЕдИзм': f"{products['unit']}"
         })
         count = count + 1
     
@@ -167,5 +143,3 @@ print('XML файл успешно создан. Для закрытия про�
 keyboard.read_event()
 
 print("программа завершена")
-
-
