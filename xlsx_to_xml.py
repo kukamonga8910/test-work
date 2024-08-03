@@ -49,7 +49,7 @@ def getFiles(filePaths):
     createXml(fileXml)
 
 
-# В данной функции получаем данные из файла и заполняем массивы
+# В данной функции получаем данные из файла и заполняем словари
 def retrievingDataFromXlsx(filesXlsx):
     global totalAmount
     wookbook = openpyxl.load_workbook(filesXlsx, data_only=True)
