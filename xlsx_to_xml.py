@@ -6,7 +6,7 @@ import keyboard
 
 
 # Путь к файлу xlsx
-FilePaths = 'E:\\1\\'
+FilePaths = '\\\\luna\\public\\OFFICE\\CS-DEP\\private_folders\\AGremilova\\ЭДО\\'
 FileXmlName = ''
 # Товары
 product = []
@@ -39,6 +39,7 @@ def getFiles(filePaths):
         if file.endswith('.xlsx'):
             if file.startswith('~$'):
                 print(f'Закройте пожалуйста файл {file}... и нажмите ENTER для продолжения')
+
                 keyboard.read_event()
                 return getFiles(FilePaths)
             filesXlsx = os.path.join(filePaths, file)
@@ -49,7 +50,7 @@ def getFiles(filePaths):
     createXml(fileXml)
 
 
-# В данной функции получаем данные из файла и заполняем словари
+# В данной функции получаем данные из файла и заполняем массивы
 def retrievingDataFromXlsx(filesXlsx):
     global totalAmount
     wookbook = openpyxl.load_workbook(filesXlsx, data_only=True)
@@ -58,17 +59,18 @@ def retrievingDataFromXlsx(filesXlsx):
         if worksheet['B' + str(i)].value == 'Наименование оборудования и Работ':
             for j in range(i+1, worksheet.max_row):
                 if worksheet['B' + str(j)].value == None:
-                    totalAmount = worksheet['K' + str(j)].value
                     break
+                price = f"{worksheet['J' + str(j)].value:.2f}"
                 product.append({'product': worksheet['B' + str(j)].value,
                                 'model': worksheet['F' + str(j)].value,
                                 'number': worksheet['H' + str(j)].value,
                                 'unit': worksheet['I' + str(j)].value,
-                                'price': worksheet['J' + str(j)].value,
-                                'sum': worksheet['K' + str(j)].value,
-                                'sumNds': worksheet['K' + str(j)].value * 1.2,
-                                'taxSumNds': worksheet['K' + str(j)].value * 1.2 - worksheet['K' + str(j)].value})
-
+                                'price': float(price),
+                                'sum': float(price) * worksheet['H' + str(j)].value,
+                                'sumNds': float(price) * worksheet['H' + str(j)].value * 1.2,
+                                'taxSumNds': float(price) * worksheet['H' + str(j)].value * 1.2 - float(price) * worksheet['H' + str(j)].value
+                })
+                totalAmount += product[-1]['sum']
 
 # Собираем новый XML файл из полученных данных
 def createXml(fileXml):
@@ -129,7 +131,6 @@ def createXml(fileXml):
     kolnetto.text = '106.000'
 
     document_node.insert(index, newTable)
-
 
     # Сохраняем изменения в XML-файл
     tree.write(f'{FilePaths}' + 'NEW_' + f'{FileXmlName}', encoding='utf-8', xml_declaration=True)
