@@ -1,0 +1,42 @@
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  nginx-common
+Suggested packages:
+  fcgiwrap nginx-doc ssl-cert
+The following NEW packages will be installed:
+  nginx nginx-common
+0 upgraded, 2 newly installed, 0 to remove and 2 not upgraded.
+Preconfiguring packages ...
+Need to get 0 B/552 kB of archives.
+After this operation, 1,596 kB of additional disk space will be used.
+Selecting previously unselected package nginx-common.
+(Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 87134 files and directories currently installed.)
+Preparing to unpack .../nginx-common_1.24.0-2ubuntu7.1_all.deb ...
+Unpacking nginx-common (1.24.0-2ubuntu7.1) ...
+Selecting previously unselected package nginx.
+Preparing to unpack .../nginx_1.24.0-2ubuntu7.1_amd64.deb ...
+Unpacking nginx (1.24.0-2ubuntu7.1) ...
+Setting up nginx (1.24.0-2ubuntu7.1) ...
+Setting up nginx-common (1.24.0-2ubuntu7.1) ...
+Created symlink /etc/systemd/system/multi-user.target.wants/nginx.service → /usr/lib/systemd/system/nginx.service.
+Processing triggers for ufw (0.36.2-6) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+
+Running kernel seems to be up-to-date.
+
+Restarting services...
+
+Service restarts being deferred:
+ /etc/needrestart/restart.d/dbus.service
+ systemctl restart systemd-logind.service
+
+No containers need to be restarted.
+
+User sessions running outdated binaries:
+ are @ session #1: sshd[1661]
+ are @ session #3: sshd[1663]
+ are @ user manager service: systemd[1666]
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
