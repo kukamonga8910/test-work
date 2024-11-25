@@ -36,7 +36,7 @@ function install_package_ubuntu {
 			
 			if [ "$?" -eq 0  ]; then
 
-				VERSION_PACKAGE=$(apt show $packages 2>/dev/null | grep "Version")
+				VERSION_PACKAGE=$(apt show mariadb-server 2>/dev/null | grep "Version" | grep -oP '\d+\.\d+\.\d+-\d+|\d+\.\d+' | head -n 1)
 				echo -e "${GREEN}DONE${COLOR_RESET}"
 				echo -e "\nDate Installed: $(date '+%Y-%m-%d %H:%M:%S')\nInstall Package: ${packages}\n${VERSION_PACKAGE}"  >> /var/log/auto_install.log
 				echo "" >> /var/log/auto_install.log
