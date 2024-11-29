@@ -1,0 +1,12 @@
+create database simple_app;
+use simple_app;
+create table cars (id int, model varchar(20), license varchar(20), color varchar(20));
+create user if not exists 'php'@'%' identified by 'phppasswd';
+grant usage on *.* to 'php'@'%';
+grant select, insert on simple_app.* to 'php'@'%';
+flush privileges;
+insert into cars values (1, 'Mercedes', 'A123BCD', 'black');
+insert into cars values (2, 'BMW', 'B456FEG', 'red');
+insert into cars values (3, 'Honda', 'C789HIJ', 'gray');
+insert into cars values (4, 'Toyota', 'D012KLM', 'black');
+insert into cars values (5, 'Ford', 'F345NOP', 'white');
