@@ -16,7 +16,6 @@ function failed_name {
     done
 }
 
-# Пример использования
 #dir="/home/are/dz2"
 failed_name "."
 
