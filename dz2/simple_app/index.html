@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <titleAdd record</title>
+</head>
+<body>
+    <h1>Adding record</h1>
+    
+    <!-- Форма для добавления записи -->
+    <form method="post" action="process_form.php">
+        <label for="id">id:</label>
+        <input type="text" id="id" name="id" required>
+	<label for="model">model:</label>
+	<input type="text" model="model" name="model" required>
+        <label for="license">license:</label>
+	<input type="text" model="licnese" name="license" required>
+	<label for="color">color:</label>
+	<input type="text" color="color" name="color" required>
+	<br><br>
+        <input type="submit" value="Add record">
+    </form>
+    
+    <br>
+    <a href="view_records.php">View all records</a>
+</body>
+</html>
