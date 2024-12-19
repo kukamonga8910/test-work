@@ -1,0 +1,24 @@
+services:
+  node1_app:
+    build:
+      context: ./node1
+      dockerfile: DockerFile
+    container_name: node1-app
+    ports:
+      - "3000:3000"
+    networks:
+      - dz-work
+
+  node2_app:
+    build:
+      context: ./node2
+      dockerfile: DockerFile
+    container_name: node2-app
+    ports:
+      - "3001:3000"
+    networks:
+      - dz-work
+
+networks:
+  dz-work:
+    external: true
